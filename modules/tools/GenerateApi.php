@@ -29,6 +29,8 @@
 
 include('../../RedirectModulesInc.php');
 
+$id = sqlSecurityFilter($_REQUEST['id']);
+
 if($_REQUEST['modfunc']=='generate')
 {
     do {
@@ -42,7 +44,7 @@ if($_REQUEST['modfunc']=='generate')
 if($_REQUEST['modfunc']=='remove')
 {
     
-    DBQuery('DELETE FROM api_info WHERE ID='.$_REQUEST['id']);
+    DBQuery('DELETE FROM api_info WHERE ID='.$id);
 }    
 PopTable('header',  _apiToken);
 $get_token=DBGet(DBQuery('SELECT * FROM api_info'));

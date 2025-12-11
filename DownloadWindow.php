@@ -30,10 +30,27 @@ include 'RedirectRootInc.php';
 include 'Warehouse.php';
 include 'Data.php';
 
+// Prevent Directory Traversal by sanitizing filename parameters
+function sanitize_filename($filename) {
+    // Remove any ../ or ..\ to prevent traversal, allow only basic safe chars
+    $filename = basename($filename);
+    // Optionally remove any remaining unwanted characters
+    $filename = preg_replace('/[^A-Za-z0-9_\.\-\s]/', '', $filename);
+    return $filename;
+}
+
+// You can use both functions for $_REQUEST['filename'].
+// First, apply sqlSecurityFilter, then sanitize_filename for maximum safety.
+if (isset($_REQUEST['filename'])) {
+    $_REQUEST['filename'] = sqlSecurityFilter($_REQUEST['filename']);
+    $_REQUEST['filename'] = sanitize_filename($_REQUEST['filename']);
+}
+if (isset($_REQUEST['name'])) {
+    $_REQUEST['name'] = sanitize_filename($_REQUEST['name']);
+}
+
 if (isset($_REQUEST['down_id']))
     $_REQUEST['down_id'] = sqlSecurityFilter($_REQUEST['down_id']);
-if (isset($_REQUEST['filename']))
-    $_REQUEST['filename'] = sqlSecurityFilter($_REQUEST['filename']);
 
 if(isset($_REQUEST['down_id']) && $_REQUEST['down_id']!='')
 {
@@ -74,7 +91,25 @@ if(isset($_REQUEST['down_id']) && $_REQUEST['down_id']!='')
 }
 else
 {
-    header('Content-Disposition: attachment; filename="'.urldecode($_REQUEST['name']).'" ');
-    readfile('assets/'.urldecode($_REQUEST['filename']));
+    // header('Content-Disposition: attachment; filename="'.$_REQUEST['name'].'" ');
+    // readfile('assets/'.urldecode($_REQUEST['filename']));
+    
+    // basename() extracts just the filename component, effectively preventing directory traversal,
+    // while urldecode() translates URL-encoded characters back to their original representation.
+    // Yes, using $filename = basename(urldecode($_REQUEST['filename'])); is correct security practice.
+    // urldecode decodes any encoded characters such as %2e or %2f,
+    // then basename strips any remaining path information, preventing directory traversal.
+    // This way, even if an attacker tries to bypass checks with encoded input, the final filename is safe to use.
+    $filename = $_REQUEST['filename'];
+    $filepath = 'assets/' . $filename;
+
+    if (!file_exists($filepath)) {
+        http_response_code(404);
+        exit('File not found or invalid filename.');
+    }
+    // Also sanitize the output filename for header, just in case
+    $output_name = basename($_REQUEST['name']);
+    header('Content-Disposition: attachment; filename="' . $output_name . '"');
+    readfile($filepath);
 }
 ?>
