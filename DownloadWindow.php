@@ -49,8 +49,11 @@ if (isset($_REQUEST['name'])) {
     $_REQUEST['name'] = sanitize_filename($_REQUEST['name']);
 }
 
+
 if (isset($_REQUEST['down_id']))
     $_REQUEST['down_id'] = sqlSecurityFilter($_REQUEST['down_id']);
+// if (isset($_REQUEST['filename']))
+//     $_REQUEST['filename'] = sqlSecurityFilter($_REQUEST['filename']);
 
 if(isset($_REQUEST['down_id']) && $_REQUEST['down_id']!='')
 {
@@ -91,7 +94,7 @@ if(isset($_REQUEST['down_id']) && $_REQUEST['down_id']!='')
 }
 else
 {
-    // header('Content-Disposition: attachment; filename="'.$_REQUEST['name'].'" ');
+     // header('Content-Disposition: attachment; filename="'.$_REQUEST['name'].'" ');
     // readfile('assets/'.urldecode($_REQUEST['filename']));
     
     // basename() extracts just the filename component, effectively preventing directory traversal,
