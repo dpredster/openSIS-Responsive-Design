@@ -410,7 +410,7 @@ if (optional_param('USERNAME', '', PARAM_RAW) && optional_param('PASSWORD', '', 
         $_SESSION['CURRENT_SCHOOL_ID'] = $login_RET[1]['CURRENT_SCHOOL_ID'];
 
         // $_SESSION['USERNAME'] = optional_param('USERNAME', '', PARAM_RAW);
-        $_SESSION['USERNAME'] = optional_param('USERNAME', '', PARAM_RAW);
+        $_SESSION['USERNAME'] = sqlSecurityFilter(optional_param('USERNAME', '', PARAM_TEXT));
 
         # --------------------- Set Session Id Start ------------------------- #
         $_SESSION['X'] = session_id();
