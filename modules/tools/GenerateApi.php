@@ -30,6 +30,9 @@
 include('../../RedirectModulesInc.php');
 
 $id = sqlSecurityFilter($_REQUEST['id']);
+// Security fix: Cast ID to integer to prevent SQL injection (CVE-2025-26186)
+// The ID field is a numeric primary key, so casting to int ensures only valid integers are used
+$id = isset($id) ? (int)$id : 0;
 
 if($_REQUEST['modfunc']=='generate')
 {
@@ -43,8 +46,10 @@ if($_REQUEST['modfunc']=='generate')
 }    
 if($_REQUEST['modfunc']=='remove')
 {
-    
-    DBQuery('DELETE FROM api_info WHERE ID='.$id);
+    // Validate ID is a positive integer before deletion
+    if($id > 0) {
+        DBQuery('DELETE FROM api_info WHERE ID='.$id);
+    }
 }    
 PopTable('header',  _apiToken);
 $get_token=DBGet(DBQuery('SELECT * FROM api_info'));

@@ -32,9 +32,18 @@ include 'Data.php';
 
 // Prevent Directory Traversal by sanitizing filename parameters
 function sanitize_filename($filename) {
-    // Remove any ../ or ..\ to prevent traversal, allow only basic safe chars
+    // Fully decode URL encoding to handle double/triple encoding attacks (e.g., %252e%252e%252f)
+    // Loop until no more decoding occurs
+    $prev = '';
+    while ($prev !== $filename) {
+        $prev = $filename;
+        $filename = urldecode($filename);
+    }
+    // Remove null bytes
+    $filename = str_replace(chr(0), '', $filename);
+    // Extract only the base filename - strips ALL path components including ../
     $filename = basename($filename);
-    // Optionally remove any remaining unwanted characters
+    // Remove any remaining unwanted characters, allow only safe chars
     $filename = preg_replace('/[^A-Za-z0-9_\.\-\s]/', '', $filename);
     return $filename;
 }
