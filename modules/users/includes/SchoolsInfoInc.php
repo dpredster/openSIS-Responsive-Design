@@ -821,7 +821,7 @@ if (!$_REQUEST['modfunc']) {
 
                 echo '<span id="ajax_output_st"></span>';
             } else {
-                echo TextInputModHidden(array($this_school_mod['PASSWORD'], str_repeat('*', strlen($this_school_mod['PASSWORD']))), 'staff_school[PASSWORD]', '', 'size=20 maxlength=100 AUTOCOMPLETE = off onkeyup=passwordStrength(this.value);validate_password(this.value);');
+                echo TextInputModHidden(str_repeat('*', strlen($this_school_mod['PASSWORD'])), 'staff_school[PASSWORD]', '', 'size=20 maxlength=100 AUTOCOMPLETE = off onkeyup=passwordStrength(this.value);validate_password(this.value);');
             }
             echo "<span id='passwordStrength'></span></div></div>";
             echo '</div>'; //.col-lg-6
