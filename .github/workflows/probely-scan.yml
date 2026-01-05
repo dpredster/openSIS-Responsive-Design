@@ -14,5 +14,5 @@ jobs:
         uses: Probely/probely-github-action@master
         with:
           api-key: ${{ secrets.PROBELY_API_KEY }}
-          target-id: ${{ secrets.2ywjYBqn6JDn}}
+          target-id: ${{ secrets.PROBELY_TARGET_ID }}
           region: eu
