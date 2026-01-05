@@ -4,15 +4,15 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - main
+      - master
 
 jobs:
   probely_scan:
     runs-on: ubuntu-latest
     steps:
       - name: Run Probely Scan
-        uses: Probely/probely-github-action@main
+        uses: Probely/probely-github-action@master
         with:
-          api-key: ${{ secrets.PROBELY_API_KEY }}
-          target-id: ${{ secrets.PROBELY_TARGET_ID }}
+          api-key: ${{ secrets.eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyZWdpb24iOiJhdSIsImp0aSI6IjNWb0Jya1JHcTFTWSIsImV4cCI6MTc5OTE0OTM5N30.lbzhcXtOyRKrt6MlFHapVrZ2MiQOc90gPiG4VhTKOWo }}
+          target-id: ${{ secrets.2ywjYBqn6JDn}}
           region: eu
