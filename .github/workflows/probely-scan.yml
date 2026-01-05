@@ -1,0 +1,17 @@
+name: Probely DAST Scan
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  probely_scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run Probely Scan
+        uses: Probely/probely-github-action@main
+        with:
+          api-key: ${{ secrets.eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyZWdpb24iOiJhdSIsImp0aSI6IjJac3d6cG1LWWY1biIsImV4cCI6MTc5OTEzNjQ5MX0.AwBxYMw9tVaomhBIMSCYGRhaYFmugptAUgYwv24plho }}
+          target-id: ${{ secrets.2ywjYBqn6JDn }}
+          region: eu
