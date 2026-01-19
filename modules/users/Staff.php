@@ -27,7 +27,6 @@
 #
 #***************************************************************************************
 
-!empty($_SESSION['USERNAME']) or die('Access denied!');
 include('../../RedirectModulesInc.php');
 include_once("../../functions/PasswordHashFnc.php");
 

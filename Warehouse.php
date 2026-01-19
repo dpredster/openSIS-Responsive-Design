@@ -40,22 +40,25 @@ if (!defined('WAREHOUSE_PHP')) {
 
     // Load functions.
     if ($handle = opendir("$openSISPath/functions")) {
-        if (!is_array($IgnoreFiles))
-            $IgnoreFiles = Array();
+        if (!isset($IgnoreFiles) || !is_array($IgnoreFiles)) {
+            $IgnoreFiles = [];
+        }
 
         while (false !== ($file = readdir($handle))) {
             // if filename isn't '.' '..' or in the Ignore list... load it.
-            if ($file != "." && $file != ".." && !in_array($file, $IgnoreFiles)) {
-                if (file_exists("$openSISPath/functions/$file"))
+            if ($file !== "." && $file !== ".." && !in_array($file, $IgnoreFiles)) {
+                if (file_exists("$openSISPath/functions/$file")) {
                     require_once("$openSISPath/functions/$file");
+                }
             }
         }
+        closedir($handle);
     }
 
     // Start Session.
     session_start();
 
-    if (!$_SESSION['STAFF_ID'] && !$_SESSION['STUDENT_ID'] && strpos($_SERVER['PHP_SELF'], 'index.php') === false) {
+    if (empty($_SESSION['STAFF_ID']) && empty($_SESSION['STUDENT_ID']) && strpos($_SERVER['PHP_SELF'] ?? '', 'index.php') === false) {
         header('Location: index.php');
         exit;
     }

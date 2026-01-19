@@ -153,13 +153,14 @@ if (UserStaffID()) {
 
 class upload {
 
-    var $target_path;
-    var $destination_path;
-    var $name;
-    var $fileExtension;
-    var $allowExtension = array("jpg", "jpeg", "png", "gif", "bmp");
-    var $wrongFormat = 0;
-    var $wrongSize = 0;
+    public $target_path = '';
+    public $destination_path = '';
+    public $name = '';
+    public $fileExtension = '';
+    public $fileSize = 0;
+    public $allowExtension = array("jpg", "jpeg", "png", "gif", "bmp");
+    public $wrongFormat = 0;
+    public $wrongSize = 0;
 
     function deleteOldImage($id = '') {
 //if(file_exists($this->target_path))
@@ -186,7 +187,8 @@ class upload {
     }
 
     function get_file_extension($file_name) {
-        return end(explode('.', $file_name));
+        $parts = explode('.', $file_name);
+        return end($parts);
     }
 
 }

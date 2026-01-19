@@ -397,7 +397,7 @@ class pgBackupRestore
                $_pggetindexdef = $this->get('pg_get_indexdef');
                $_indisprimary = $this->get('indisprimary');
 
-               if (eregi("^CREATE UNIQUE INDEX", $_pggetindexdef))
+               if (preg_match("/^CREATE UNIQUE INDEX/i", $_pggetindexdef))
                {
                   $_keyword = ($_indisprimary == 't') ? 'PRIMARY KEY' : 'UNIQUE';
                   $strSQL = str_replace("CREATE UNIQUE INDEX", "" , $this->get('pg_get_indexdef'));

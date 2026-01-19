@@ -263,7 +263,8 @@ if (clean_param($_REQUEST['values'], PARAM_NOTAGS) && ($_POST['values'] || $_REQ
                     }
 
                     if (stripos($_SERVER['SERVER_SOFTWARE'], 'linux')) {
-                        $value = mysql_real_escape_string($value);
+                        global $connection;
+                        $value = mysqli_real_escape_string($connection, $value);
                     }
                     $sql .= $column . "='" . $value . " ',";
                 }

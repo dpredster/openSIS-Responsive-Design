@@ -26,14 +26,14 @@
 #
 #***************************************************************************************
 // INSERT/UPDATE,[fields][values]/WHERE,[]fields/,Propernames
-function SaveData($iu_extra,$fields_done=false,$field_names=false)
+function SaveData($iu_extra, $fields_done = false, $field_names = false)
 {
 	if(!$fields_done)
 		$fields_done = array();
 	if(!$field_names)
 		$field_names = array();
 
-	if($_REQUEST['month_values'])
+	if(!empty($_REQUEST['month_values']))
 	{
 		foreach($_REQUEST['month_values'] as $table=>$values)
 		{
@@ -144,11 +144,11 @@ function SaveData($iu_extra,$fields_done=false,$field_names=false)
 					{
                                                 //$value=paramlib_validation($column,$value);
 						$ins_fields[$table] .= $column.',';
-                                                if(stripos($_SERVER['SERVER_SOFTWARE'], 'linux')){
+                                                if(stripos($_SERVER['SERVER_SOFTWARE'] ?? '', 'linux') !== false){
                                                $ins_values[$table] .= '\''.singleQuoteReplace('','',$value).'\',';
                                                
-                                                }else
-						$ins_values[$table] .= '\''.singleQuoteReplace('','',$value).'\',';
+                                                }else{
+						$ins_values[$table] .= '\''.singleQuoteReplace('','',$value).'\',';}
 						$go = true;
 					}
 				}
@@ -156,10 +156,10 @@ function SaveData($iu_extra,$fields_done=false,$field_names=false)
                                   
 					if(strlen($value)>0){
                                              $value=paramlib_validation($column,$value);
-                                             if(stripos($_SERVER['SERVER_SOFTWARE'], 'linux')){
+                                             if(stripos($_SERVER['SERVER_SOFTWARE'] ?? '', 'linux') !== false){
                                              $up_values = $column.'=\''.singleQuoteReplace('','',$value).'\',';
-                                             }else
-					     $up_values = $column.'=\''.singleQuoteReplace('','',$value).'\',';
+                                             }else{
+					     $up_values = $column.'=\''.singleQuoteReplace('','',$value).'\',';}
                                         
                                              $sql[$table] .= $up_values;
                                              if($column == 'END_DATE' && $table=='student_enrollment' )

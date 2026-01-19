@@ -1039,7 +1039,8 @@ if (clean_param($_REQUEST['tables'], PARAM_NOTAGS) && ($_POST['tables'] || $_REQ
                             }
                         } else {
                             if (stripos($_SERVER['SERVER_SOFTWARE'], 'linux')) {
-                                $value = mysql_real_escape_string($value);
+                                global $connection;
+                                $value = mysqli_real_escape_string($connection, $value);
                                 $value = str_replace('%u201D', "\"", $value);
                             }
 
@@ -1430,7 +1431,8 @@ if (clean_param($_REQUEST['tables'], PARAM_NOTAGS) && ($_POST['tables'] || $_REQ
                         $value = trim(paramlib_validation($column, $value));
                         $fields .= $column . ',';
                         if (stripos($_SERVER['SERVER_SOFTWARE'], 'linux')) {
-                            $value = mysql_real_escape_string($value);
+                            global $connection;
+                            $value = mysqli_real_escape_string($connection, $value);
                         }
                         $value = str_replace('"', '""', $value);
                         $values .= '"' . $value . '",';

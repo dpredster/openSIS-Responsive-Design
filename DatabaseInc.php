@@ -107,9 +107,9 @@ function DBQuery($sql)
 
     // $connection = db_start();
 
-    if (isset($_SESSION['STAFF_ID'])) {
+    if (!empty($_SESSION['STAFF_ID'])) {
         $userId = $_SESSION['STAFF_ID'];
-    } elseif (isset($_SESSION['STUDENT_ID'])) {
+    } elseif (!empty($_SESSION['STUDENT_ID'])) {
         $userId = $_SESSION['STUDENT_ID'];
     } else {
         $userId = '';
@@ -144,13 +144,13 @@ function DBQuery($sql)
 
                 foreach ($array as $value) {
                     if ($value != "") {
-                        $user_agent = explode('/', $_SERVER['HTTP_USER_AGENT']);
-                        if ($user_agent[0] == 'Mozilla') {
+                        $user_agent = explode('/', $_SERVER['HTTP_USER_AGENT'] ?? '');
+                        if (isset($user_agent[0]) && $user_agent[0] === 'Mozilla') {
                             $result = $connection->query($value);
                         }
                         if (!$result) {
-                            $user_agent = explode('/', $_SERVER['HTTP_USER_AGENT']);
-                            if ($user_agent[0] == 'Mozilla') {
+                            $user_agent = explode('/', $_SERVER['HTTP_USER_AGENT'] ?? '');
+                            if (isset($user_agent[0]) && $user_agent[0] === 'Mozilla') {
                                 $connection->query("ROLLBACK");
                                 die(db_show_error($sql, _dbExecuteFailed, mysqli_error($connection)));
                             }
@@ -158,9 +158,8 @@ function DBQuery($sql)
                     }
                 }
             } else {
-                $user_agent = explode('/', $_SERVER['HTTP_USER_AGENT']);
-                if ($user_agent[0] == 'Mozilla') {
-                    // $result = $connection->query($sql) or die(db_show_error($sql, _dbExecuteFailed, mysqli_error($connection)));
+                $user_agent = explode('/', $_SERVER['HTTP_USER_AGENT'] ?? '');
+                if (isset($user_agent[0]) && $user_agent[0] === 'Mozilla') {
                     try {
                         $result = $connection->query($sql);
                     } catch (Exception $e) {
@@ -170,7 +169,7 @@ function DBQuery($sql)
             }
             break;
     }
-    return $result;
+    return $result ?? false;
 }
 function DBQuery_assignment($sql)
 {
@@ -199,13 +198,13 @@ function DBQuery_assignment($sql)
                 $array = explode(";", $sql);
                 foreach ($array as $value) {
                     if ($value != "") {
-                        $user_agent = explode('/', $_SERVER['HTTP_USER_AGENT']);
-                        if ($user_agent[0] == 'Mozilla') {
+                        $user_agent = explode('/', $_SERVER['HTTP_USER_AGENT'] ?? '');
+                        if (isset($user_agent[0]) && $user_agent[0] === 'Mozilla') {
                             $result = $connection->query($value);
                         }
                         if (!$result) {
-                            $user_agent = explode('/', $_SERVER['HTTP_USER_AGENT']);
-                            if ($user_agent[0] == 'Mozilla') {
+                            $user_agent = explode('/', $_SERVER['HTTP_USER_AGENT'] ?? '');
+                            if (isset($user_agent[0]) && $user_agent[0] === 'Mozilla') {
                                 $connection->query("ROLLBACK");
                                 die(db_show_error($sql, _dbExecuteFailed, mysqli_error($connection)));
                             }
@@ -213,14 +212,14 @@ function DBQuery_assignment($sql)
                     }
                 }
             } else {
-                $user_agent = explode('/', $_SERVER['HTTP_USER_AGENT']);
-                if ($user_agent[0] == 'Mozilla') {
+                $user_agent = explode('/', $_SERVER['HTTP_USER_AGENT'] ?? '');
+                if (isset($user_agent[0]) && $user_agent[0] === 'Mozilla') {
                     $result = $connection->query($sql) or die(db_show_error($sql, _dbExecuteFailed, mysqli_error($connection)));
                 }
             }
             break;
     }
-    return $result;
+    return $result ?? false;
 }
 function DBQueryMod($sql)
 {
@@ -246,14 +245,14 @@ function DBQueryMod($sql)
                 $array = explode(";", $sql);
                 foreach ($array as $value) {
                     if ($value != "") {
-                        $user_agent = explode('/', $_SERVER['HTTP_USER_AGENT']);
-                        if ($user_agent[0] == 'Mozilla') {
+                        $user_agent = explode('/', $_SERVER['HTTP_USER_AGENT'] ?? '');
+                        if (isset($user_agent[0]) && $user_agent[0] === 'Mozilla') {
                             $result = $connection->query($value);
                         }
 
                         if (!$result) {
-                            $user_agent = explode('/', $_SERVER['HTTP_USER_AGENT']);
-                            if ($user_agent[0] == 'Mozilla') {
+                            $user_agent = explode('/', $_SERVER['HTTP_USER_AGENT'] ?? '');
+                            if (isset($user_agent[0]) && $user_agent[0] === 'Mozilla') {
                                 $connection->query("ROLLBACK");
                                 die(db_show_error($sql, _dbExecuteFailed, mysqli_error($connection)));
                             }
@@ -261,34 +260,37 @@ function DBQueryMod($sql)
                     }
                 }
             } else {
-                $user_agent = explode('/', $_SERVER['HTTP_USER_AGENT']);
-                if ($user_agent[0] == 'Mozilla') {
+                $user_agent = explode('/', $_SERVER['HTTP_USER_AGENT'] ?? '');
+                if (isset($user_agent[0]) && $user_agent[0] === 'Mozilla') {
                     $result = $connection->query($sql) or die(db_show_error($sql, _dbExecuteFailed, mysqli_error($connection)));
                 }
             }
             break;
     }
-    return $result;
+    return $result ?? false;
 }
 
 // return next row.
 function db_fetch_row($result)
 {
     global $DatabaseType;
+    $return = null;
 
     switch ($DatabaseType) {
         case 'mysqli':
-            $return = $result->fetch_assoc();
-            if (is_array($return)) {
-                foreach ($return as $key) {
-                    if (is_int($key)) {
-                        unset($return[$key]);
+            if ($result instanceof mysqli_result) {
+                $return = $result->fetch_assoc();
+                if (is_array($return)) {
+                    foreach ($return as $key => $value) {
+                        if (is_int($key)) {
+                            unset($return[$key]);
+                        }
                     }
                 }
             }
             break;
     }
-    return (is_array($return)) ? array_change_key_case($return, CASE_UPPER) : $return;
+    return is_array($return) ? array_change_key_case($return, CASE_UPPER) : $return;
 }
 
 // returns code to go into SQL statement for accessing the next value of a sequence function db_seq_nextval($seqname)
