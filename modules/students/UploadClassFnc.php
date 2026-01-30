@@ -27,15 +27,16 @@
 #***************************************************************************************
 class upload{
 
-var $target_path;
-var $destination_path;
-var $name;
-var $fileExtension;
-var $fileSize;
-var $allowExtension=array("jpg","jpeg","png","gif","bmp");
-var $wrongFormat=0;
-var $wrongSize=0;
-function deleteOldImage($id=''){
+public $target_path = '';
+public $destination_path = '';
+public $name = '';
+public $fileExtension = '';
+public $fileSize = 0;
+public $allowExtension = array("jpg","jpeg","png","gif","bmp");
+public $wrongFormat = 0;
+public $wrongSize = 0;
+
+function deleteOldImage($id = '') {
     if($id!='')
     {
         DBQuery('DELETE FROM user_file_upload WHERE ID='.$id);
@@ -44,23 +45,25 @@ function deleteOldImage($id=''){
 //	unlink($this->target_path);
 }
 
-function setFileExtension(){
-$this->fileExtension=strtolower(substr($this->name,strrpos($this->name,".")+1));
+function setFileExtension() {
+$this->fileExtension = strtolower(substr($this->name, strrpos($this->name, ".") + 1));
 }
 
-function validateImageSize(){
+function validateImageSize() {
 if($this->fileSize > 10485760){
-$this->wrongSize=1;
+$this->wrongSize = 1;
 }
 }
 
-function validateImage(){
+function validateImage() {
 if(!in_array($this->fileExtension, $this->allowExtension)){
-$this->wrongFormat=1;
+$this->wrongFormat = 1;
 }
 }
+
 function get_file_extension($file_name) {
-return end(explode('.',$file_name));
+$parts = explode('.', $file_name);
+return end($parts);
 }
 }
 ?>

@@ -857,20 +857,20 @@ function _mysqldump_table_data($table)
 }
 function _mysql_test($mysql_host,$mysql_database, $mysql_username, $mysql_password)
 {
-	global $output_messages;
-	$link = new mysqli($mysql_host, $mysql_username, $mysql_password,$mysql_database,$mysql_port);
-	if (!$link)
+	global $output_messages, $DatabasePort;
+	$mysql_port = $DatabasePort;
+	$link = new mysqli($mysql_host, $mysql_username, $mysql_password, $mysql_database, $mysql_port);
+	if ($link->connect_error)
 	{
-	   array_push($output_messages, ''._couldNotConnect.': ' . mysql_error());
+	   array_push($output_messages, ''._couldNotConnect.': ' . $link->connect_error);
 	}
 	else
 	{
 		array_push ($output_messages,""._connectedWithMySqlServer.":$mysql_username@$mysql_host successfully");
-		//$db_selected = mysql_select_db($mysql_database, $link);
-                $db_selected = new mysqli($mysql_host, $mysql_username, $mysql_password,$mysql_database,$mysql_port);
-		if (!$db_selected)
+		$db_selected = new mysqli($mysql_host, $mysql_username, $mysql_password, $mysql_database, $mysql_port);
+		if ($db_selected->connect_error)
 		{
-			array_push ($output_messages,''._canTUse.' $mysql_database : ' . mysql_error());
+			array_push ($output_messages,''._canTUse.' $mysql_database : ' . $db_selected->connect_error);
 		}
 		else
 			array_push ($output_messages,""._connectedWithMySqlDatabase.":$mysql_database successfully");

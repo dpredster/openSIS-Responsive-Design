@@ -27,10 +27,11 @@
 #***************************************************************************************
 function ReindexResults($array)
 {
- 	$i=1;
+	$new = array();
+ 	$i = 1;
 	foreach($array as $value)
 	{
-		$new[$i]=$value;
+		$new[$i] = $value;
 		$i++;
 	}
 	return $new;

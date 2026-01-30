@@ -883,8 +883,8 @@ function clean_text($text, $format = 'FORMAT_SIS')
    }
 
    /// Remove potential script events - some extra protection for undiscovered bugs in our code
-   $text = preg_filter("([^a-z])language([[:space:]]*)=", "\\1Xlanguage=", $text);
-   $text = preg_filter("([^a-z])on([a-z]+)([[:space:]]*)=", "\\1Xon\\2=", $text);
+   $text = preg_replace("([^a-z])language([[:space:]]*)=", "\\1Xlanguage=", $text) ?? $text;
+   $text = preg_replace("([^a-z])on([a-z]+)([[:space:]]*)=", "\\1Xon\\2=", $text) ?? $text;
 
    return $text;
 }

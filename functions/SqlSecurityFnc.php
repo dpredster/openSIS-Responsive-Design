@@ -85,7 +85,15 @@ function sqlSecurityFilter($variableName = '', $dbAvailable = 'yes')
                         $k_check_3 = $k_check_2;
                     }
  
+                    // Handle nested arrays recursively (PHP 8.x fix)
+                    if (is_array($oneval)) {
+                        // Recursively sanitize nested arrays
+                        $filter_data[$k_check_3] = sqlSecurityFilter($oneval, $dbAvailable);
+                        continue;
+                    }
+ 
                     // Sanitize value if it is a string
+                    $v_check_3 = '';
                     if (is_string($oneval)) {
                         $v_check_1 = strip_tags($oneval);
                         $v_check_2 = addslashes($v_check_1);

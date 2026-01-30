@@ -854,7 +854,8 @@ if (clean_param($_REQUEST['values'], PARAM_NOTAGS) && ($_POST['values'] || $_REQ
                 $columns['comment'] = clean_param($columns['comment'], PARAM_NOTAGS);
                 $sql .= $sep;
                 if (stripos($_SERVER['SERVER_SOFTWARE'], 'linux')) {
-                    $columns['comment'] = mysql_real_escape_string($columns['comment']);
+                    global $connection;
+                    $columns['comment'] = mysqli_real_escape_string($connection, $columns['comment']);
                 }
                 $sql .= 'COMMENT=\'' . singleQuoteReplace('', '', $columns['comment']) . '\' ';
             }

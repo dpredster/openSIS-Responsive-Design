@@ -90,12 +90,12 @@ function DBQuery($sql)
 						$result = $connection->query($value);
 						if (!$result) {
 							$connection->query("ROLLBACK");
-							die(db_show_error($sql, _dbExecuteFailed, mysql_error()));
+							die(db_show_error($sql, _dbExecuteFailed, $connection->error));
 						}
 					}
 				}
 			} else {
-				$result = $connection->query($sql) or die(db_show_error($sql, _dbExecuteFailed, mysql_error()));
+				$result = $connection->query($sql) or die(db_show_error($sql, _dbExecuteFailed, $connection->error));
 			}
 			break;
 	}

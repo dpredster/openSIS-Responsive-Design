@@ -340,8 +340,8 @@ function browser_detection( $which_test ) {
 			// delete this part if you want an unknown browser returned
 			$s_browser = substr( $browser_user_agent, 0, strcspn( $browser_user_agent , '();') );
 			// this extracts just the browser name from the string
-			ereg('[^0-9][a-z]*-*\ *[a-z]*\ *[a-z]*', $s_browser, $r );
-			$s_browser = $r[0];
+			preg_match('/[^0-9][a-z]*-*\ *[a-z]*\ *[a-z]*/i', $s_browser, $r );
+			$s_browser = $r[0] ?? '';
 			$version_number = browser_version( $browser_user_agent, $s_browser );
 
 			// then uncomment this part
@@ -359,7 +359,7 @@ function browser_detection( $which_test ) {
 		// pulls out primary version number from more complex string, like 7.5a, 
 		// use this for numeric version comparison
 		$m = array();
-		if ( ereg('[0-9]*\.*[0-9]*', $version_number, $m ) )
+		if ( preg_match('/[0-9]*\.*[0-9]*/', $version_number, $m ) )
 		{
 			$math_version_number = $m[0]; 
 			

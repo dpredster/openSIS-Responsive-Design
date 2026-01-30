@@ -26,47 +26,50 @@
 #
 #***************************************************************************************
 error_reporting(0);
-	$dbconn = mysql_connect($_SESSION['server'],$_SESSION['username'],$_SESSION['password']) or die();
-	mysql_select_db("information_schema");
-	
-$r = mysql_query(
-	"select concat('select concat(''alter table ',t.table_name,' auto_increment='',max(',c.column_name,')+1) from ',t1.table_name)
+
+// PHP 8.x compatible - using mysqli
+$dbconn = new mysqli($_SESSION['server'], $_SESSION['username'], $_SESSION['password'], 'information_schema', $_SESSION['port'] ?? 3306);
+if ($dbconn->connect_error) {
+    die("Connection failed: " . $dbconn->connect_error);
+}
+
+$r = $dbconn->query(
+    "select concat('select concat(''alter table ',t.table_name,' auto_increment='',max(',c.column_name,')+1) from ',t1.table_name)
   from TABLES t
-	inner join TABLES t1 ON t1.table_name=REPLACE(t.table_name,'_seq','')
-		inner join COLUMNS c ON c.table_name=t1.table_name AND c.column_key='PRI'
-	where t.table_schema='".$_SESSION['db']."' and t.table_name like '%_seq' and t1.table_name<>'schedule'
+    inner join TABLES t1 ON t1.table_name=REPLACE(t.table_name,'_seq','')
+        inner join COLUMNS c ON c.table_name=t1.table_name AND c.column_key='PRI'
+    where t.table_schema='".$dbconn->real_escape_string($_SESSION['db'])."' and t.table_name like '%_seq' and t1.table_name<>'schedule'
   union
-  select 'select concat(''alter table schedule auto_increment='',max(id)+1) from schedule'
-");
+  select 'select concat(''alter table schedule auto_increment='',max(id)+1) from schedule'"
+);
 
-	if (!$r) {
-		die(mysql_error());
-	}
-	$i=0;
-	
-	while($row = mysql_fetch_array($r)) {
-		$s[$i++] = $row[0];
-	
-	}
-	mysql_free_result($r);
+if (!$r) {
+    die($dbconn->error);
+}
 
-	
-	mysql_select_db($_SESSION['db']) or die() ;
-	$i1=0;
-	for($x=0;$x<$i;$x++) {
-		$r = mysql_query($s[$x]);
-		
-		if($row = mysql_fetch_array($r)) {
-			$s1[$i1++] = $row[0];
-		}
-	}
-	mysql_free_result($r);
+$i = 0;
+$s = array();
+while($row = $r->fetch_array()) {
+    $s[$i++] = $row[0];
+}
+$r->free();
 
-	
-	for($x=0;$x<$i1;$x++) {
-	
-		$r = mysql_query($s1[$x]);
-	
-	}
-	mysql_free_result($r);
+// Switch to the target database
+$dbconn->select_db($_SESSION['db']);
+
+$i1 = 0;
+$s1 = array();
+for($x = 0; $x < $i; $x++) {
+    $r = $dbconn->query($s[$x]);
+    if($r && $row = $r->fetch_array()) {
+        $s1[$i1++] = $row[0];
+    }
+    if ($r) $r->free();
+}
+
+for($x = 0; $x < $i1; $x++) {
+    $dbconn->query($s1[$x]);
+}
+
+$dbconn->close();
 ?>

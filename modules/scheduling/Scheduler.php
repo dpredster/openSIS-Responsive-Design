@@ -449,7 +449,7 @@ function get_min($time)
     $stage = substr($org_tm, -2);
     $main_tm = substr($org_tm, 0, 5);
     $main_tm = trim($main_tm);
-    $sp_time = split(':', $main_tm);
+    $sp_time = explode(':', $main_tm);
     $hr = $sp_time[0];
     $min = $sp_time[1];
     if ($hr == 12) {

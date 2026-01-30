@@ -73,7 +73,11 @@ where sgr.student_id= ';
 if ($_REQUEST['modfunc'] == 'save') {
     $handle = PDFStart();
     //loop through each student
-    $_REQUEST['st_arr'] = array_unique($_REQUEST['st_arr']);
+    if (!isset($_REQUEST['st_arr']) || !is_array($_REQUEST['st_arr'])) {
+        $_REQUEST['st_arr'] = array();
+    } else {
+        $_REQUEST['st_arr'] = array_unique($_REQUEST['st_arr']);
+    }
     foreach ($_REQUEST['st_arr'] as $arrkey => $student_id) {
         $total_QP_transcript = 0;
         $total_QP_transcript_fy = 0;

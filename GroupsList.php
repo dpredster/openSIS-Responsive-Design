@@ -27,14 +27,17 @@
 #***************************************************************************************
 include("Data.php");
 include("Warehouse.php");
-$con=mysql_connect($DatabaseServer,$DatabaseUsername,$DatabasePassword);
-$s=mysql_select_db($DatabaseName,$con);
-$keyword = $_REQUEST['str'];
+// PHP 8.x compatible - using mysqli
+$con = new mysqli($DatabaseServer, $DatabaseUsername, $DatabasePassword, $DatabaseName);
+if ($con->connect_error) {
+    die("Connection failed: " . $con->connect_error);
+}
+$keyword = $_REQUEST['str'] ?? '';
 if($keyword=="")
     echo "";
 else
 {
-$grpnames=DBGet(DBQuery("select * from mail_groupmembers where group_id=$keyword")) or die(mysql_error());
+$grpnames=DBGet(DBQuery("select * from mail_groupmembers where group_id=" . intval($keyword)));
 if(count($grpnames))
 {
     foreach($grpnames  as $k => $v)
