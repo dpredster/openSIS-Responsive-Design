@@ -99,6 +99,10 @@ $RET_gradecompleted = DBGet(DBQuery($sql_gradecompleted));
 
 if (count($RET)) {
     unset($i);
+    // Use plain text for Excel export, Font Awesome icons for web display
+    $checkIcon = isset($_REQUEST['_openSIS_PDF']) ? 'Yes' : '<i class="fa fa-check fa-lg text-success"></i>';
+    $timesIcon = isset($_REQUEST['_openSIS_PDF']) ? 'No' : '<i class="fa fa-times fa-lg text-danger"></i>';
+    
     foreach ($RET as $staff_id => $periods) {
         $i++;
         $staff_RET[$i]['FULL_NAME'] = $periods[key($periods)][1]['FULL_NAME'];
@@ -107,10 +111,10 @@ if (count($RET)) {
 
 
                 if (($period[1]['PERIOD_ID'] == $val['PERIOD_ID']) && ($periods[key($periods)][1]['STAFF_ID'] == $val['STAFF_ID'] ))
-                    $staff_RET[$i][$period_id] = '<i class="fa fa-check fa-lg text-success"></i>';
+                    $staff_RET[$i][$period_id] = $checkIcon;
             }
             if (!$staff_RET[$i][$period_id])
-                $staff_RET[$i][$period_id] = '<i class="fa fa-times fa-lg text-danger"></i>';
+                $staff_RET[$i][$period_id] = $timesIcon;
         }
     }
 }
