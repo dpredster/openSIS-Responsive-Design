@@ -634,22 +634,22 @@ if ($_SESSION['PageAccess']!= 'stu_pass' && $_SESSION['PageAccess']!= 'stf_pass'
                         <form name="f1" method="post" class="text-left" action="">
 
                             <?php if ($flag == 'stu_pass') { ?>
-                                <input type="hidden" name="user_info" value="<?php echo cryptor($stu_info[1]['STUDENT_ID'], 'ENC', '') . ',' . cryptor('3', 'ENC', '') . ',' . $_REQUEST['uname']; ?>"/>
+                                <input type="hidden" name="user_info" value="<?php echo htmlspecialchars(cryptor($stu_info[1]['STUDENT_ID'], 'ENC', '') . ',' . cryptor('3', 'ENC', '') . ',' . ($uname ?? ''), ENT_QUOTES, 'UTF-8'); ?>"/>
                                 <?php
                             }
                             if ($flag == 'stf_pass') {
                                 ?>
-                                <input type="hidden" name="user_info" value="<?php echo cryptor($stf_info[1]['STAFF_ID'], 'ENC', '') . ',' . cryptor($stf_info[1]['PROFILE_ID'], 'ENC', '') . ',' . $_REQUEST['uname']; ?>"/>
+                                <input type="hidden" name="user_info" value="<?php echo htmlspecialchars(cryptor($stf_info[1]['STAFF_ID'], 'ENC', '') . ',' . cryptor($stf_info[1]['PROFILE_ID'], 'ENC', '') . ',' . ($uname ?? ''), ENT_QUOTES, 'UTF-8'); ?>"/>
                                 <?php
                             }
                             if ($flag == 'par_pass') {
                                 ?>
-                                <input type="hidden" name="user_info" value="<?php echo cryptor($par_info[1]['STAFF_ID'], 'ENC', '') . ',' . cryptor($par_info[1]['PROFILE_ID'], 'ENC', '') . ',' . $_REQUEST['uname']; ?>"/>
+                                <input type="hidden" name="user_info" value="<?php echo htmlspecialchars(cryptor($par_info[1]['STAFF_ID'], 'ENC', '') . ',' . cryptor($par_info[1]['PROFILE_ID'], 'ENC', '') . ',' . ($uname ?? ''), ENT_QUOTES, 'UTF-8'); ?>"/>
                                 <?php
                             }
                             if ($flag == 'submited_value') {
                                 ?>
-                                <input type="hidden" name="user_info" value="<?php echo $user_info; ?>"/>
+                                <input type="hidden" name="user_info" value="<?php echo htmlspecialchars($user_info ?? '', ENT_QUOTES, 'UTF-8'); ?>"/>
                                 <?php
                             }
                             ?>
@@ -666,13 +666,13 @@ if ($_SESSION['PageAccess']!= 'stu_pass' && $_SESSION['PageAccess']!= 'stf_pass'
                                 <!--                                <label class="control-label">Enter new password</label>-->
                                 <input type="password" name="new_pass" id="new_pass" class="form-control" placeholder="Enter new password" AUTOCOMPLETE="off" onkeyup="forgotpasswordStrength(this.value);
                 passwordMatch();
-                forgotpassvalidate_password(this.value, '<?php echo $_REQUEST['uname']; ?>',<?php
+                forgotpassvalidate_password(this.value, <?php echo json_encode(htmlspecialchars($_REQUEST['uname'] ?? '', ENT_QUOTES, 'UTF-8')); ?>,<?php
                                 if ($flag == 'stu_pass')
                                     echo 3;
                                 else if ($flag == 'stf_pass')
-                                    echo $stf_info[1]['PROFILE_ID'];
+                                    echo (int)$stf_info[1]['PROFILE_ID'];
                                 else
-                                    echo $par_info[1]['PROFILE_ID'];
+                                    echo (int)$par_info[1]['PROFILE_ID'];
                                 ?>);" />
                                 <p id="passwordStrength" class="p-5"></p>
                             </div>
