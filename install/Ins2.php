@@ -1,5 +1,4 @@
 <?php
-
 #**************************************************************************
 #  openSIS is a free student information system for public and non-public
 #  schools from Open Solutions for Education, Inc. web: www.os4ed.com
@@ -28,8 +27,35 @@
 #***************************************************************************************
 include '../functions/ParamLibFnc.php';
 require_once "../functions/PragRepFnc.php";
-error_reporting(0);
 session_start();
+
+// Restore session variables from hidden form fields if session is empty
+if (empty($_SESSION['server']) && !empty($_POST['sess_server'])) {
+    $_SESSION['server'] = $_POST['sess_server'];
+    $_SESSION['username'] = $_POST['sess_username'];
+    $_SESSION['password'] = $_POST['sess_password'];
+    $_SESSION['port'] = $_POST['sess_port'];
+    $_SESSION['host'] = $_POST['sess_host'];
+}
+
+// Helper function to create mysqli connection with strict mode disabled
+function createConnection($server, $username, $password, $database = '', $port = 3306) {
+    if ($database != '') {
+        $conn = new mysqli($server, $username, $password, $database, $port);
+    } else {
+        $conn = new mysqli($server, $username, $password, '', $port);
+    }
+    if ($conn && !$conn->connect_errno) {
+        $conn->query("SET SESSION sql_mode = ''");
+    }
+    return $conn;
+}
+
+// Check session variables - show error if still not set
+if (empty($_SESSION['server']) || empty($_SESSION['username'])) {
+    die("<h2>Error: Session variables not set properly.</h2><pre>Server: " . ($_SESSION['server'] ?? 'NOT SET') . "\nUsername: " . ($_SESSION['username'] ?? 'NOT SET') . "\nPort: " . ($_SESSION['port'] ?? 'NOT SET') . "</pre><p>Please <a href='Step1.php'>go back to Step 1</a> and re-enter your MySQL credentials.</p>");
+}
+
 if (clean_param($_REQUEST["db"], PARAM_DATA) == '') {
     header('Location: Step2.php?err=Database name cannot be blank');
     exit;
@@ -47,7 +73,7 @@ if (clean_param($_REQUEST["db"], PARAM_DATA) == '') {
     //     $purgedb = clean_param($_REQUEST["purgedb"], PARAM_ALPHA); // Added variable to check for removing existing data.
 
     // $dbconn = new mysqli($_SESSION['server'], $_SESSION['username'], $_SESSION['password'], $_SESSION['db'], $_SESSION['port']);
-    $db = new mysqli($_SESSION['server'], $_SESSION['username'], $_SESSION['password']);
+    $db = createConnection($_SESSION['server'], $_SESSION['username'], $_SESSION['password']);
     $database = $_SESSION['db'];
     $query = "SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME=?";
     $stmt = $db->prepare($query);
@@ -62,7 +88,7 @@ if (clean_param($_REQUEST["db"], PARAM_DATA) == '') {
             exit;
         }
 
-        $dbconn = new mysqli($_SESSION['server'], $_SESSION['username'], $_SESSION['password'], $_SESSION['db'], $_SESSION['port']);
+        $dbconn = createConnection($_SESSION['server'], $_SESSION['username'], $_SESSION['password'], $_SESSION['db'], $_SESSION['port']);
 
         if (empty($purgedb)) {
             $sql = "SHOW TABLES";
@@ -81,6 +107,7 @@ if (clean_param($_REQUEST["db"], PARAM_DATA) == '') {
                 $dbconn->close();
 
                 header('Location: Step3.php');
+                exit;
             }
         } else {
             // Get tables, loop thru the tables and drop each table.
@@ -118,13 +145,14 @@ if (clean_param($_REQUEST["db"], PARAM_DATA) == '') {
             $dbconn->close();
 
             header('Location: Step3.php');
+            exit;
         }
     } else {
         if (empty($newdb)) {
             header('Location: Step2.php?err=Database does not exist. Enter a different database or use the create a new database checkbox.');
             exit;
         } else {
-            $dbconn = new mysqli($_SESSION['server'], $_SESSION['username'], $_SESSION['password'], '', $_SESSION['port']);
+            $dbconn = createConnection($_SESSION['server'], $_SESSION['username'], $_SESSION['password'], '', $_SESSION['port']);
             $sql = "CREATE DATABASE `" . $_SESSION['db'] . "` CHARACTER SET=utf8;";
             try {
                 $result = $dbconn->query($sql);
@@ -149,6 +177,7 @@ if (clean_param($_REQUEST["db"], PARAM_DATA) == '') {
 
             // edited installation
             header('Location: Step3.php');
+            exit;
         }
     }
     $stmt->close();
@@ -156,7 +185,11 @@ if (clean_param($_REQUEST["db"], PARAM_DATA) == '') {
 
 function executeSQL($myFile)
 {
-    $dbconn = new mysqli($_SESSION['server'], $_SESSION['username'], $_SESSION['password'], $_SESSION['db'], $_SESSION['port']);
+    $dbconn = createConnection($_SESSION['server'], $_SESSION['username'], $_SESSION['password'], $_SESSION['db'], $_SESSION['port']);
+    
+    // Enable function creation with binary logging
+    $dbconn->query("SET GLOBAL log_bin_trust_function_creators = 1");
+    
     $sql = file_get_contents($myFile);
     $sqllines = par_spt("/[\n]/", $sql);
 
@@ -187,8 +220,10 @@ function executeSQL($myFile)
 
 function createUpdatedByTriggers()
 {
-    $dbconn = new mysqli($_SESSION['server'], $_SESSION['username'], $_SESSION['password'], $_SESSION['db'], $_SESSION['port']);
-    $dbconn = new mysqli($_SESSION['server'], $_SESSION['username'], $_SESSION['password'], $_SESSION['db'], $_SESSION['port']);
+    $dbconn = createConnection($_SESSION['server'], $_SESSION['username'], $_SESSION['password'], $_SESSION['db'], $_SESSION['port']);
+    
+    // Enable trigger/function creation with binary logging
+    $dbconn->query("SET GLOBAL log_bin_trust_function_creators = 1");
 
     if ($result = $dbconn->query("SELECT DISTINCT TABLE_NAME
                 FROM INFORMATION_SCHEMA.COLUMNS

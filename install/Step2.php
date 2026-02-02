@@ -25,7 +25,20 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 #***************************************************************************************
-error_reporting(0);
+session_start();
+
+// Restore session from URL parameter if session is empty
+if (empty($_SESSION['server']) && !empty($_GET['sd'])) {
+    $sess_data = json_decode(base64_decode($_GET['sd']), true);
+    if ($sess_data) {
+        $_SESSION['server'] = $sess_data['server'];
+        $_SESSION['username'] = $sess_data['username'];
+        $_SESSION['password'] = $sess_data['password'];
+        $_SESSION['port'] = $sess_data['port'];
+        $_SESSION['host'] = $sess_data['host'];
+    }
+}
+
 echo '<script type="text/javascript">
 var page=parent.location.href.replace(/.*\//,"");
 if(page && page!="index.php"){
@@ -95,6 +108,12 @@ if(page && page!="index.php"){
                                     </script>
                                 <?php } ?>
                                 <form name='step2' id='step2' method='post' onsubmit='return db_validate()' action='Ins2.php'>
+                                    <!-- Hidden fields to preserve session data across requests -->
+                                    <input type="hidden" name="sess_server" value="<?php echo htmlspecialchars($_SESSION['server'] ?? ''); ?>" />
+                                    <input type="hidden" name="sess_username" value="<?php echo htmlspecialchars($_SESSION['username'] ?? ''); ?>" />
+                                    <input type="hidden" name="sess_password" value="<?php echo htmlspecialchars($_SESSION['password'] ?? ''); ?>" />
+                                    <input type="hidden" name="sess_port" value="<?php echo htmlspecialchars($_SESSION['port'] ?? '3306'); ?>" />
+                                    <input type="hidden" name="sess_host" value="<?php echo htmlspecialchars($_SESSION['host'] ?? ''); ?>" />
                                     <div class="row">
                                         <div class="col-md-6">
                                             <div class="form-group">

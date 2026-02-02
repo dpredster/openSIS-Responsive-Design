@@ -26,7 +26,9 @@
 #
 #***************************************************************************************
 
-error_reporting(0);
+// Enable error reporting for debugging
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
 session_start();
 
 require_once "../functions/PasswordHashFnc.php";
@@ -37,6 +39,9 @@ $_SESSION['admin_pwd'] = GenerateNewHash($_POST['apassword']);
 require_once "../functions/PragRepFnc.php";
 //mysql_select_db($_SESSION['db']);
 $dbconn = new mysqli($_SESSION['server'],$_SESSION['username'],$_SESSION['password'],$_SESSION['db'],$_SESSION['port']);
+if ($dbconn && !$dbconn->connect_errno) {
+    $dbconn->query("SET SESSION sql_mode = ''");
+}
 if($dbconn->connect_errno!=0)
 {
     echo "<h2>" . $dbconn->error . "</h2>\n";

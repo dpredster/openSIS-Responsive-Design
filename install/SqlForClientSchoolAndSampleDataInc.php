@@ -1640,7 +1640,10 @@ INSERT INTO `user_profiles` (`id`, `profile`, `title`, `last_updated`, `updated_
 (5, 'admin', 'Admin Asst', '2019-07-28 08:26:33', NULL),
 (6, 'admin', 'Test', '2022-10-13 22:08:47', NULL);";
 
-$dbconn = new mysqli($_SESSION['host'],$_SESSION['username'],$_SESSION['password'],$_SESSION['db'],$_SESSION['port']);
+$dbconn = new mysqli($_SESSION['server'],$_SESSION['username'],$_SESSION['password'],$_SESSION['db'],$_SESSION['port']);
+if ($dbconn && !$dbconn->connect_errno) {
+    $dbconn->query("SET SESSION sql_mode = ''");
+}
 $sqllines = par_spt("/[\n]/",$text);
 $cmd = '';
 foreach($sqllines as $l)

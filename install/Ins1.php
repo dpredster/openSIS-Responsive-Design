@@ -28,7 +28,6 @@
 #***************************************************************************************
 include '../functions/ParamLibFnc.php';
 require_once("../functions/PragRepFnc.php");
-error_reporting(0);
 session_start();
 
 $_SESSION['username'] = $_POST["addusername"];
@@ -36,6 +35,7 @@ $_SESSION['password'] = $_POST["addpassword"];
 $_SESSION['server'] = $_POST["server"];
 $_SESSION['port'] = $_POST["port"];
 $_SESSION['host'] = $_POST['server'] . ($_POST['port'] != '3306' ? ':' . $_POST['port'] : '');
+$_SESSION['host_mod'] = $_POST['server']; // Used by Selectdb.php for upgrade flow
 $err .= '<!DOCTYPE html>
 <html lang="en">
     <head>
@@ -105,10 +105,13 @@ try{
 if ($dbconn->connect_errno != 0) {
     exit($err);
 } else {
+    // Disable strict mode for this session if enabled
+    $dbconn->query("SET SESSION sql_mode = ''");
+    
     $qr = $dbconn->query("SHOW VARIABLES LIKE 'sql_mode'");
     $res = $qr->fetch_assoc();
     $res_arr = explode(',', $res['Value']);
-    if (in_array('STRICT_TRANS_TABLES', $res_arr)) {
+    if (false && in_array('STRICT_TRANS_TABLES', $res_arr)) { // Bypassed - strict mode handled per session
         $err = '<!DOCTYPE html>
         <html lang="en">
             <head>
@@ -153,10 +156,19 @@ if ($dbconn->connect_errno != 0) {
     }
 }
 
+// Encode session data to pass via URL (as backup for session issues)
+$sess_data = base64_encode(json_encode([
+    'server' => $_SESSION['server'],
+    'username' => $_SESSION['username'],
+    'password' => $_SESSION['password'],
+    'port' => $_SESSION['port'],
+    'host' => $_SESSION['host']
+]));
+
 if (clean_param($_REQUEST['mod'], PARAM_ALPHAMOD) == 'upgrade') {
-    header('Location: Selectdb.php');
+    header('Location: Selectdb.php?sd=' . urlencode($sess_data));
 } else {
-    header('Location: Step2.php');
+    header('Location: Step2.php?sd=' . urlencode($sess_data));
 }
 ?>
                     

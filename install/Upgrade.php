@@ -65,6 +65,8 @@
 
                             if ($dbconn->connect_errno != 0)
                                 exit($dbconn->error);
+                            // Disable strict mode for this session
+                            $dbconn->query("SET SESSION sql_mode = ''");
                             if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
                                 $result = $dbconn->query("SHOW VARIABLES LIKE 'basedir'");
                                 $row = $result->fetch_assoc();
@@ -1080,7 +1082,9 @@ WHERE value='4.6' OR value='4.7' OR value LIKE '4.8%' OR value='4.9' OR value='5
                                     mysqli_close($dbconn);
                                     //        mysql_select_db($mysql_database);
                                     $dbconn = new mysqli($_SESSION['server'], $_SESSION['username'], $_SESSION['password'], $_SESSION['db'], $_SESSION['port']);
-
+                                    if ($dbconn && !$dbconn->connect_errno) {
+                                        $dbconn->query("SET SESSION sql_mode = ''");
+                                    }
 
                                     $myFile = "OpensisUpdateSchemaMysql.sql";
 
@@ -1124,6 +1128,9 @@ WHERE value='4.6' OR value='4.7' OR value LIKE '4.8%' OR value='4.9' OR value='5
                                     $myFile = "OpensisUpdateTriggerMysql.sql";
                                     executeSQL($myFile, $mysql_database);
                                     $dbconn = new mysqli($_SESSION['server'], $_SESSION['username'], $_SESSION['password'], $_SESSION['db'], $_SESSION['port']);
+                                    if ($dbconn && !$dbconn->connect_errno) {
+                                        $dbconn->query("SET SESSION sql_mode = ''");
+                                    }
                                     $dbconn->query("delete from app") or die('<i class="fa fa-exclamation-triangle fa-3x text-danger"></i><h2>' . $dbconn->error . ' at line 395</h2><br/><a href="Step0.php" class="btn btn-danger"><i class="fa fa-refresh"></i> Start Again</a>');
                                     $appTable = "INSERT INTO `app` (`name`, `value`) VALUES
 ('version', '5.3'),
@@ -1256,6 +1263,9 @@ WHERE value='4.6' OR value='4.7' OR value LIKE '4.8%' OR value='4.9' OR value='5
                                 $cmd = '';
                                 $delim = false;
                                 $dbconncus = new mysqli($_SESSION['server'], $_SESSION['username'], $_SESSION['password'], $mysql_database, $_SESSION['port']);
+                                if ($dbconncus && !$dbconncus->connect_errno) {
+                                    $dbconncus->query("SET SESSION sql_mode = ''");
+                                }
                                 foreach ($sqllines as $l) {
                                     if (par_rep_mt('/^\s*--/', $l) == 0) {
                                         if (par_rep_mt('/DELIMITER \$\$/', $l) != 0) {

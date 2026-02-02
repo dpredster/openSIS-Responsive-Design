@@ -28,6 +28,19 @@
 error_reporting(0);
 session_start();
 $conn_string = $_SESSION['conn'];
+
+// Helper function to create mysqli connection with strict mode disabled
+function createConnectionSelectDb($server, $username, $password, $database = '', $port = 3306) {
+    if ($database != '') {
+        $conn = new mysqli($server, $username, $password, $database, $port);
+    } else {
+        $conn = new mysqli($server, $username, $password);
+    }
+    if ($conn && !$conn->connect_errno) {
+        $conn->query("SET SESSION sql_mode = ''");
+    }
+    return $conn;
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -72,7 +85,7 @@ $conn_string = $_SESSION['conn'];
 
                                 <form name='selectdb' class="form-horizontal" id='selectdb' method='post' action="UpgradeProcessingMsg.php">
                                     <?php
-                                    $connection = new mysqli($_SESSION['host_mod'], $_SESSION['username'], $_SESSION['password']) or die();
+                                    $connection = createConnectionSelectDb($_SESSION['host_mod'], $_SESSION['username'], $_SESSION['password']) or die();
 
                                     if ($connection->connect_errno > 0)
                                         die('Not connected');

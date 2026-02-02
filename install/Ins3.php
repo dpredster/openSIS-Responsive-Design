@@ -1,4 +1,5 @@
 <?php
+
 #**************************************************************************
 #  openSIS is a free student information system for public and non-public 
 #  schools from Open Solutions for Education, Inc. web: www.os4ed.com
@@ -25,11 +26,20 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 #***************************************************************************************
-error_reporting(0);
 include '../functions/ParamLibFnc.php';
 require_once("../functions/PragRepFnc.php");
 session_start();
-$dbconn = new mysqli($_SESSION['server'],$_SESSION['username'],$_SESSION['password'],$_SESSION['db'],$_SESSION['port']);
+
+// Helper function to create mysqli connection with strict mode disabled
+function createConnectionIns3($server, $username, $password, $database = '', $port = 3306) {
+    $conn = new mysqli($server, $username, $password, $database, $port);
+    if ($conn && !$conn->connect_errno) {
+        $conn->query("SET SESSION sql_mode = ''");
+    }
+    return $conn;
+}
+
+$dbconn = createConnectionIns3($_SESSION['server'],$_SESSION['username'],$_SESSION['password'],$_SESSION['db'],$_SESSION['port']);
 //$result = mysql_select_db($_SESSION['db']);
         if($dbconn->connect_errno!=0)
         {
@@ -93,7 +103,11 @@ echo '<script type="text/javascript">window.location = "Step4.php"</script>';
 
 function executeSQL($myFile)
 {
-    $dbconn = new mysqli($_SESSION['server'],$_SESSION['username'],$_SESSION['password'],$_SESSION['db'],$_SESSION['port']);
+    $dbconn = createConnectionIns3($_SESSION['server'],$_SESSION['username'],$_SESSION['password'],$_SESSION['db'],$_SESSION['port']);
+    
+    // Enable trigger/function creation with binary logging
+    $dbconn->query("SET GLOBAL log_bin_trust_function_creators = 1");
+    
     $sql = file_get_contents($myFile);
     $sqllines = par_spt("/[\n]/",$sql);
     $cmd = '';
